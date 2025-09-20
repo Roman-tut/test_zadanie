@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type Option = { size: string; amount: number };
 
@@ -21,6 +21,10 @@ type EditModalProps = {
 export function EditModal({ item, onClose, onSave }: EditModalProps) {
   const [formData, setFormData] = useState<Item | null>(item);
 
+  useEffect(() => {
+    setFormData(item);
+  }, [item]);
+
   if (!formData) return null;
 
   const handleChange = <K extends keyof Omit<Item, 'options'>>(field: K, value: Item[K]) => {
@@ -29,38 +33,37 @@ export function EditModal({ item, onClose, onSave }: EditModalProps) {
 
   const renderInput = (field: keyof Item) => {
     const value = formData[field];
+
     const isIdField = field === 'id';
     const isInactiveField =
       !formData.active && ['name', 'title', 'description'].includes(field.toString().toLowerCase());
     const disabled = isIdField || isInactiveField;
 
-    // boolean
     if (typeof value === 'boolean') {
       return (
-        <label key={field} className="flex items-center gap-2 mb-2">
-          {field}:
+        <label key={field} className="flex items-center gap-2 mb-3">
+          <span className="capitalize">{field}:</span>
           <input
             type="checkbox"
             checked={value}
             disabled={disabled}
-            className={disabled ? 'bg-gray-200 cursor-not-allowed' : ''}
+            className={`h-5 w-5 rounded border-gray-300 ${disabled ? 'cursor-not-allowed' : ''}`}
             onChange={(e) => handleChange(field as keyof Omit<Item, 'options'>, e.target.checked)}
           />
         </label>
       );
     }
 
-    // number
     if (typeof value === 'number') {
       return (
-        <label key={field} className="block mb-2">
-          {field}:
+        <label key={field} className="block mb-3">
+          <span className="capitalize">{field}:</span>
           <input
             type="number"
             value={value}
             disabled={disabled}
-            className={`border rounded px-2 py-1 w-full ${
-              disabled ? 'bg-gray-200 cursor-not-allowed' : ''
+            className={`mt-1 block w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+              disabled ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
             onChange={(e) =>
               handleChange(field as keyof Omit<Item, 'options'>, Number(e.target.value))
@@ -70,17 +73,16 @@ export function EditModal({ item, onClose, onSave }: EditModalProps) {
       );
     }
 
-    // date
     if (typeof value === 'string' && field.toString().toLowerCase().includes('date')) {
       return (
-        <label key={field} className="block mb-2">
-          {field}:
+        <label key={field} className="block mb-3">
+          <span className="capitalize">{field}:</span>
           <input
             type="date"
             value={value.split('T')[0]}
             disabled={disabled}
-            className={`border rounded px-2 py-1 w-full ${
-              disabled ? 'bg-gray-200 cursor-not-allowed' : ''
+            className={`mt-1 block w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+              disabled ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
             onChange={(e) => handleChange(field as keyof Omit<Item, 'options'>, e.target.value)}
           />
@@ -88,22 +90,21 @@ export function EditModal({ item, onClose, onSave }: EditModalProps) {
       );
     }
 
-    // options
     if (field === 'options' && value) {
       const options: Option[] = Array.isArray(value)
         ? (value as Option[])
         : [{ ...(value as Option) }];
 
       return (
-        <div key={field} className="mb-2 pl-2 border-l border-gray-200">
-          <div className="font-semibold">Options:</div>
+        <div key={field} className="mb-3 p-2 border rounded bg-gray-50">
+          <div className="font-semibold mb-2">Options:</div>
           {options.map((option, index) => (
-            <div key={index} className="flex gap-2 mb-1">
+            <div key={index} className="flex gap-2 mb-2">
               <input
                 type="text"
                 placeholder="Size"
                 value={option.size}
-                className="border rounded px-2 py-1 w-1/2"
+                className="border rounded px-3 py-2 w-1/2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                 onChange={(e) => {
                   const newOptions = [...options];
                   newOptions[index] = { ...newOptions[index], size: e.target.value };
@@ -117,7 +118,7 @@ export function EditModal({ item, onClose, onSave }: EditModalProps) {
                 type="number"
                 placeholder="Amount"
                 value={option.amount}
-                className="border rounded px-2 py-1 w-1/2"
+                className="border rounded px-3 py-2 w-1/2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                 onChange={(e) => {
                   const newOptions = [...options];
                   newOptions[index] = { ...newOptions[index], amount: Number(e.target.value) };
@@ -133,17 +134,16 @@ export function EditModal({ item, onClose, onSave }: EditModalProps) {
       );
     }
 
-    // string
     if (typeof value === 'string') {
       return (
-        <label key={field} className="block mb-2">
-          {field}:
+        <label key={field} className="block mb-3">
+          <span className="capitalize">{field}:</span>
           <input
             type="text"
             value={value}
             disabled={disabled}
-            className={`border rounded px-2 py-1 w-full ${
-              disabled ? 'bg-gray-200 cursor-not-allowed' : ''
+            className={`mt-1 block w-full border rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+              disabled ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
             onChange={(e) => handleChange(field as keyof Omit<Item, 'options'>, e.target.value)}
           />
@@ -156,17 +156,19 @@ export function EditModal({ item, onClose, onSave }: EditModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow w-96 max-h-[80vh] overflow-y-auto">
-        <h3 className="text-lg font-bold mb-4">Edit Item</h3>
+      <div className="bg-white p-6 rounded-xl shadow-2xl w-96 max-h-[80vh] overflow-y-auto animate-fadeIn">
+        <h3 className="text-xl font-bold mb-5 text-center text-blue-700">Edit Item</h3>
 
         {Object.keys(formData).map((key) => renderInput(key as keyof Item))}
 
-        <div className="flex justify-end gap-2 mt-4">
-          <button className="px-3 py-1 bg-gray-300 rounded" onClick={onClose}>
+        <div className="flex justify-end gap-3 mt-5">
+          <button
+            className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors"
+            onClick={onClose}>
             Cancel
           </button>
           <button
-            className="px-3 py-1 bg-green-500 text-white rounded"
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             onClick={() => formData && onSave(formData)}>
             Save
           </button>

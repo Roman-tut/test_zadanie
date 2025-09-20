@@ -1,11 +1,15 @@
 export function formatDate(dateString: string | null): string {
   if (!dateString) return '-';
   const date = new Date(dateString);
-  return date.toLocaleString('en-GB', {
+  return date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   });
+}
+
+// Получение даты в формате yyyy-MM-dd для input[type="date"] и фильтра
+export function formatDateISO(dateString: string | null): string {
+  if (!dateString) return '';
+  return new Date(dateString).toISOString().split('T')[0];
 }

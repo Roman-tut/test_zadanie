@@ -20,8 +20,8 @@ export function PricePlansPage() {
           { key: 'description', header: 'Description' },
           { key: 'active', header: 'Active' },
 
-          { key: 'createdAt', header: 'Created At', render: (row) => formatDate(row.createdAt) },
-          { key: 'removedAt', header: 'RemovedAt At', render: (row) => formatDate(row.removedAt) },
+          { key: 'createdAt', header: 'CreatedAt ', render: (row) => formatDate(row.createdAt) },
+          { key: 'removedAt', header: 'RemovedAt ', render: (row) => formatDate(row.removedAt) },
         ]}
         dateColumns={['createdAt', 'removedAt']}
         onEdit={(row) => setEditing(row)}

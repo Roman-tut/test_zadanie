@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { parse, isSameDay } from 'date-fns';
 
 type Column<T> = {
   key: keyof T;
@@ -26,9 +27,8 @@ export function UniversalTable<T extends { id: number | string }>({
   const [selectedDate, setSelectedDate] = useState('');
 
   const handleSort = (key: keyof T) => {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
+    if (sortKey === key) setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    else {
       setSortKey(key);
       setSortOrder('asc');
     }
@@ -50,12 +50,12 @@ export function UniversalTable<T extends { id: number | string }>({
     }
 
     if (selectedDate && dateColumns.length > 0) {
-      const selected = new Date(selectedDate).toDateString();
+      const parsedSelected = parse(selectedDate, 'dd.MM.yyyy', new Date());
       const dateMatches = dateColumns.some((col) => {
         const value = row[col];
         if (!value) return false;
-        const rowDate = new Date(String(value)).toDateString();
-        return rowDate === selected;
+        const rowDate = new Date(String(value));
+        return isSameDay(parsedSelected, rowDate);
       });
       if (!dateMatches) matches = false;
     }
@@ -74,18 +74,19 @@ export function UniversalTable<T extends { id: number | string }>({
     : filteredData;
 
   return (
-    <div className="overflow-x-auto border rounded-lg shadow">
-      <div className="flex gap-2 p-2 flex-wrap items-center">
+    <div className="overflow-x-auto border rounded-lg shadow-lg bg-white">
+      {/* Фильтры */}
+      <div className="flex gap-2 p-3 flex-wrap items-center bg-gray-50 border-b rounded-t-lg">
         <input
           type="text"
           placeholder="Search..."
-          className="border px-2 py-1 rounded w-1/3"
+          className="border px-3 py-2 rounded w-1/3 focus:ring-2 focus:ring-blue-300 focus:outline-none"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
 
         <select
-          className="border px-2 py-1 rounded"
+          className="border px-3 py-2 rounded focus:ring-2 focus:ring-blue-300 focus:outline-none"
           value={activeFilter}
           onChange={(e) => setActiveFilter(e.target.value as 'all' | 'true' | 'false')}>
           <option value="all">Active</option>
@@ -97,8 +98,9 @@ export function UniversalTable<T extends { id: number | string }>({
           <div className="flex gap-1 items-center">
             <label className="text-sm">Date:</label>
             <input
-              type="date"
-              className="border px-2 py-1 rounded"
+              type="text"
+              placeholder="22.09.1960"
+              className="border px-3 py-2 rounded focus:ring-2 focus:ring-blue-300 focus:outline-none"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
             />
@@ -106,34 +108,39 @@ export function UniversalTable<T extends { id: number | string }>({
         )}
       </div>
 
+      {/* Таблица */}
       <table className="w-full border-collapse">
-        <thead className="bg-gray-100">
+        <thead className="bg-blue-50">
           <tr>
             {columns.map((col) => (
               <th
                 key={String(col.key)}
-                className="text-left px-4 py-2 border-b font-medium text-gray-700 cursor-pointer"
+                className="text-left px-4 py-3 border-b font-semibold text-blue-700 cursor-pointer select-none transition-colors hover:bg-blue-100"
                 onClick={() => handleSort(col.key)}>
                 {col.header}
                 {sortKey === col.key && (sortOrder === 'asc' ? ' 🔼' : ' 🔽')}
               </th>
             ))}
-            {onEdit && <th className="px-4 py-2">Actions</th>}
+            {onEdit && <th className="px-4 py-3 border-b">Actions</th>}
           </tr>
         </thead>
         <tbody>
-          {sortedData.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
+          {sortedData.map((row, idx) => (
+            <tr
+              key={row.id}
+              className={`transition-colors ${
+                idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+              } hover:bg-blue-50`}>
               {columns.map((col) => (
-                <td key={String(col.key)} className="px-4 py-2 border-b">
+                <td key={String(col.key)} className="px-4 py-2 border-b text-gray-700">
                   {col.render ? col.render(row) : String(row[col.key] ?? '')}
                 </td>
               ))}
               {onEdit && (
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 border-b">
                   <button
                     onClick={() => onEdit(row)}
-                    className="px-4 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600">
+                    className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
                     Edit
                   </button>
                 </td>

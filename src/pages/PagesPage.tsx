@@ -21,7 +21,7 @@ export function PagesPage() {
           { key: 'active', header: 'Active' },
           {
             key: 'updatedAt',
-            header: 'UpdatedAtAt',
+            header: 'UpdatedAt',
             render: (row) => formatDate(row.updatedAt),
           },
           {
