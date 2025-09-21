@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { parse, isSameDay } from 'date-fns';
 
 type Column<T> = {
@@ -14,7 +14,7 @@ type UniversalTableProps<T> = {
   dateColumns?: (keyof T)[];
 };
 
-export function UniversalTable<T extends { id: number | string }>({
+function UniversalTableComponent<T extends { id: number | string }>({
   data,
   columns,
   onEdit,
@@ -26,13 +26,16 @@ export function UniversalTable<T extends { id: number | string }>({
   const [activeFilter, setActiveFilter] = useState<'all' | 'true' | 'false'>('all');
   const [selectedDate, setSelectedDate] = useState('');
 
-  const handleSort = (key: keyof T) => {
-    if (sortKey === key) setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    else {
-      setSortKey(key);
-      setSortOrder('asc');
-    }
-  };
+  const handleSort = useCallback(
+    (key: keyof T) => {
+      if (sortKey === key) setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      else {
+        setSortKey(key);
+        setSortOrder('asc');
+      }
+    },
+    [sortKey, sortOrder],
+  );
 
   const filteredData = data.filter((row) => {
     let matches = true;
@@ -75,7 +78,6 @@ export function UniversalTable<T extends { id: number | string }>({
 
   return (
     <div className="overflow-x-auto border rounded-lg shadow-lg bg-white">
-      {/* фильтры */}
       <div className="flex gap-2 p-3 flex-wrap items-center bg-gray-50 border-b rounded-t-lg">
         <input
           type="text"
@@ -108,7 +110,6 @@ export function UniversalTable<T extends { id: number | string }>({
         )}
       </div>
 
-      {/* таблица */}
       <table className="w-full border-collapse">
         <thead className="bg-blue-50">
           <tr>
@@ -152,3 +153,4 @@ export function UniversalTable<T extends { id: number | string }>({
     </div>
   );
 }
+export const UniversalTable = React.memo(UniversalTableComponent) as typeof UniversalTableComponent;

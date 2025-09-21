@@ -1,69 +1,43 @@
 # React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Установка и запуск
+1.Установите зависимости:npm install,
+2.Запустите development сервер: npm run dev,
+3.Соберите проект для production:npm run build,
+4.Запустите линтинг:npm run lint,
+5.Просмотр production сборки:npm run preview.
 
-Currently, two official plugins are available:
+Функциональность
+1.Продукты - просмотр и редактирование,
+2.Продукты - просмотр и редактирование,
+3.Страницы - контент-менеджмент.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Особенности
+1.CRUD операции с данными,
+2.Модальные окна для редактирования,
+3.Фильтрация и сортировка таблиц,
+4.Адаптивный дизайн с Tailwind CSS,
+5.Типизация на TypeScript.
 
-## Expanding the ESLint configuration
+Стилизация
+1.Адаптивная сетка,
+2.Современные UI компоненты,
+3.Кастомные цвета и отступы.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Основные зависимости
+1.react & react-dom - React 19,
+2.zustand - управление состоянием,
+3.react-router-dom - маршрутизация,
+4.react-datepicker - выбор дат,
+5.date-fns - работа с датами,
+6.typescript - типизация,
+7.vite - сборка,
+8.eslint - линтинг,
+9.tailwindcss - стили,
+10.postcss - обработка CSS.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Настройка ESLint
+1.TypeScript проверку типов,
+2.React Hooks правила,
+3.React Refresh для HMR,
+4.Стилистические правилаю.

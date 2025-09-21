@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 
 type Option = { size: string; amount: number };
 
@@ -18,18 +18,52 @@ type EditModalProps<T extends Item> = {
   onSave: (updated: T) => void;
 };
 
-export function EditModal<T extends Item>({ item, onClose, onSave }: EditModalProps<T>) {
+function EditModalComponent<T extends Item>({ item, onClose, onSave }: EditModalProps<T>) {
   const [formData, setFormData] = useState<T>(() => item);
 
   useEffect(() => {
     setFormData(item);
   }, [item]);
 
-  if (!formData) return null;
+  const handleChange = useCallback(
+    <K extends keyof Omit<Item, 'options'>>(field: K, value: Item[K]) => {
+      setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
+    },
+    [],
+  );
 
-  const handleChange = <K extends keyof Omit<Item, 'options'>>(field: K, value: Item[K]) => {
-    setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
-  };
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  const handleSave = useCallback(() => {
+    if (formData) {
+      onSave(formData);
+    }
+  }, [formData, onSave]);
+
+  const handleOptionsChange = useCallback(
+    (index: number, field: keyof Option, value: string | number) => {
+      setFormData((prev) => {
+        if (!prev || !prev.options) return prev;
+
+        const currentOptions = Array.isArray(prev.options)
+          ? [...prev.options]
+          : [{ ...prev.options }];
+
+        const newOptions = [...currentOptions];
+        newOptions[index] = { ...newOptions[index], [field]: value };
+
+        return {
+          ...prev,
+          options: Array.isArray(prev.options) ? newOptions : newOptions[0],
+        };
+      });
+    },
+    [],
+  );
+
+  if (!formData) return null;
 
   const renderInput = (field: keyof Item) => {
     const value = formData[field];
@@ -105,28 +139,14 @@ export function EditModal<T extends Item>({ item, onClose, onSave }: EditModalPr
                 placeholder="Size"
                 value={option.size}
                 className="border rounded px-3 py-2 w-1/2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                onChange={(e) => {
-                  const newOptions = [...options];
-                  newOptions[index] = { ...newOptions[index], size: e.target.value };
-                  setFormData({
-                    ...formData,
-                    options: Array.isArray(value) ? newOptions : newOptions[0],
-                  });
-                }}
+                onChange={(e) => handleOptionsChange(index, 'size', e.target.value)}
               />
               <input
                 type="number"
                 placeholder="Amount"
                 value={option.amount}
                 className="border rounded px-3 py-2 w-1/2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                onChange={(e) => {
-                  const newOptions = [...options];
-                  newOptions[index] = { ...newOptions[index], amount: Number(e.target.value) };
-                  setFormData({
-                    ...formData,
-                    options: Array.isArray(value) ? newOptions : newOptions[0],
-                  });
-                }}
+                onChange={(e) => handleOptionsChange(index, 'amount', Number(e.target.value))}
               />
             </div>
           ))}
@@ -164,12 +184,12 @@ export function EditModal<T extends Item>({ item, onClose, onSave }: EditModalPr
         <div className="flex justify-end gap-3 mt-5">
           <button
             className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition-colors"
-            onClick={onClose}>
+            onClick={handleClose}>
             Cancel
           </button>
           <button
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-            onClick={() => formData && onSave(formData)}>
+            onClick={handleSave}>
             Save
           </button>
         </div>
@@ -177,3 +197,5 @@ export function EditModal<T extends Item>({ item, onClose, onSave }: EditModalPr
     </div>
   );
 }
+
+export const EditModal = memo(EditModalComponent) as typeof EditModalComponent;
