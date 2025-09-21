@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useStore, type Product } from '../store/useStore';
-import { UniversalTable } from '../components/UniversalTable';
-import { EditModal } from '../components/EditModal';
-import { formatDate } from '../utils//formatDate';
+import { useStore } from '../shared/store/useStore';
+import type { Product } from '../shared/types/entities';
+import { UniversalTable } from '../shared/ui/UniversalTable';
+import { EditModal } from '../features/edit-modal/EditModal';
+import { formatDate } from '../shared/utils/formatDate';
 
 export function ProductsPage() {
   const { products, setProducts } = useStore();

@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { ProductsPage } from './pages/ProductsPage';
-import { PagesPage } from './pages/PagesPage';
-import { PricePlansPage } from './pages/PricePlansPage';
+import { ProductsPage } from '../pages/ProductsPage';
+import { PagesPage } from '../pages/PagesPage';
+import { PricePlansPage } from '../pages/PricePlansPage';
 
 export default function App() {
   const linkClass = (isActive: boolean) =>

@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import type { Page } from '../store/useStore';
-import { useStore } from '../store/useStore';
-import { UniversalTable } from '../components/UniversalTable';
-import { EditModal } from '../components/EditModal';
-import { formatDate } from '../utils//formatDate';
+import type { Page } from '../shared/types/entities';
+import { useStore } from '../shared/store/useStore';
+import { UniversalTable } from '../shared/ui/UniversalTable';
+import { EditModal } from '../features/edit-modal/EditModal';
+import { formatDate } from '../shared/utils/formatDate';
 
 export function PagesPage() {
   const [editing, setEditing] = useState<Page | null>(null);
