@@ -4,22 +4,22 @@ type Option = { size: string; amount: number };
 
 export type Item = {
   id: number;
-  name: string;
+  name?: string;
   title?: string;
   description?: string;
   active: boolean;
-  createdAt: string;
+  createdAt?: string;
   options?: Option | Option[];
 };
 
-type EditModalProps = {
-  item: Item | null;
+type EditModalProps<T extends Item> = {
+  item: T;
   onClose: () => void;
-  onSave: (updated: Item) => void;
+  onSave: (updated: T) => void;
 };
 
-export function EditModal({ item, onClose, onSave }: EditModalProps) {
-  const [formData, setFormData] = useState<Item | null>(item);
+export function EditModal<T extends Item>({ item, onClose, onSave }: EditModalProps<T>) {
+  const [formData, setFormData] = useState<T>(() => item);
 
   useEffect(() => {
     setFormData(item);

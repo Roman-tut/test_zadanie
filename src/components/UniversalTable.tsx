@@ -75,7 +75,7 @@ export function UniversalTable<T extends { id: number | string }>({
 
   return (
     <div className="overflow-x-auto border rounded-lg shadow-lg bg-white">
-      {/* Фильтры */}
+      {/* фильтры */}
       <div className="flex gap-2 p-3 flex-wrap items-center bg-gray-50 border-b rounded-t-lg">
         <input
           type="text"
@@ -108,7 +108,7 @@ export function UniversalTable<T extends { id: number | string }>({
         )}
       </div>
 
-      {/* Таблица */}
+      {/* таблица */}
       <table className="w-full border-collapse">
         <thead className="bg-blue-50">
           <tr>
