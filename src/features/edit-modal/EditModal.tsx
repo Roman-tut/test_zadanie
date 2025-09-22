@@ -25,12 +25,9 @@ function EditModalComponent<T extends Item>({ item, onClose, onSave }: EditModal
     setFormData(item);
   }, [item]);
 
-  const handleChange = useCallback(
-    <K extends keyof Omit<Item, 'options'>>(field: K, value: Item[K]) => {
-      setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
-    },
-    [],
-  );
+  const handleChange = <K extends keyof Omit<Item, 'options'>>(field: K, value: Item[K]) => {
+    setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
+  };
 
   const handleClose = useCallback(() => {
     onClose();
