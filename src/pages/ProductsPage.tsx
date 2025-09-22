@@ -4,32 +4,57 @@ import type { Product } from '../shared/types/entities';
 import { UniversalTable } from '../shared/ui/UniversalTable';
 import { EditModal } from '../features/edit-modal/EditModal';
 import { formatDate } from '../shared/utils/formatDate';
+import { FilterControl } from '../shared/ui/FilterControl';
+import { useTableData } from '../shared/hooks/useTableData';
 
 export function ProductsPage() {
   const { products, setProducts } = useStore();
   const [editing, setEditing] = useState<Product | null>(null);
 
+  const { sortedData, sort, filters, handleSort, updateFilter } = useTableData({
+    initialData: products,
+    dateColumns: ['createdAt'],
+    getSearchValues: (row) => [
+      String(row.id),
+      row.name,
+      row.options.size,
+      String(row.options.amount),
+      String(row.active),
+      row.createdAt,
+    ],
+  });
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Products</h2>
-      <UniversalTable
-        data={products}
+
+      <FilterControl filters={filters} updateFilter={updateFilter} hasDateFilter={true} />
+
+      <UniversalTable<Product>
+        data={sortedData}
         columns={[
           { key: 'id', header: 'ID' },
           { key: 'name', header: 'Name' },
           {
             key: 'options',
             header: 'Options',
-            render: (row) => `${row.options.size} /${row.options.amount}`,
+            render: (row) => `${row.options.size} / ${row.options.amount}`,
           },
           { key: 'active', header: 'Active' },
-          { key: 'createdAt', header: 'Created At', render: (row) => formatDate(row.createdAt) },
+          {
+            key: 'createdAt',
+            header: 'Created At',
+            render: (row) => formatDate(row.createdAt),
+          },
         ]}
-        dateColumns={['createdAt']}
         onEdit={(row) => setEditing(row)}
+        onSort={handleSort}
+        sortKey={sort.key}
+        sortOrder={sort.order}
       />
+
       {editing && (
-        <EditModal
+        <EditModal<Product>
           item={editing}
           onClose={() => setEditing(null)}
           onSave={(updated) => {

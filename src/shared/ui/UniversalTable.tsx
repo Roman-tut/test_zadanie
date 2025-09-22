@@ -1,6 +1,4 @@
-import React, { useCallback, useState } from 'react';
-import { parse, isSameDay } from 'date-fns';
-
+import React from 'react';
 type Column<T> = {
   key: keyof T;
   header: string;
@@ -11,105 +9,21 @@ type UniversalTableProps<T> = {
   data: T[];
   columns: Column<T>[];
   onEdit?: (row: T) => void;
-  dateColumns?: (keyof T)[];
+  onSort?: (key: keyof T) => void;
+  sortKey?: keyof T | null;
+  sortOrder: 'asc' | 'desc';
 };
 
 function UniversalTableComponent<T extends { id: number | string }>({
   data,
   columns,
   onEdit,
-  dateColumns = [],
+  onSort,
+  sortKey,
+  sortOrder,
 }: UniversalTableProps<T>) {
-  const [sortKey, setSortKey] = useState<keyof T | null>(null);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [filter, setFilter] = useState('');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'true' | 'false'>('all');
-  const [selectedDate, setSelectedDate] = useState('');
-
-  const handleSort = useCallback(
-    (key: keyof T) => {
-      if (sortKey === key) setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-      else {
-        setSortKey(key);
-        setSortOrder('asc');
-      }
-    },
-    [sortKey, sortOrder],
-  );
-
-  const filteredData = data.filter((row) => {
-    let matches = true;
-
-    if (filter) {
-      const text = filter.toLowerCase();
-      matches = Object.values(row).some((val) => String(val).toLowerCase().includes(text));
-    }
-
-    if (activeFilter !== 'all' && 'active' in row) {
-      const isActive = Boolean(row['active']);
-      if ((activeFilter === 'true' && !isActive) || (activeFilter === 'false' && isActive)) {
-        matches = false;
-      }
-    }
-
-    if (selectedDate && dateColumns.length > 0) {
-      const parsedSelected = parse(selectedDate, 'dd.MM.yyyy', new Date());
-      const dateMatches = dateColumns.some((col) => {
-        const value = row[col];
-        if (!value) return false;
-        const rowDate = new Date(String(value));
-        return isSameDay(parsedSelected, rowDate);
-      });
-      if (!dateMatches) matches = false;
-    }
-
-    return matches;
-  });
-
-  const sortedData = sortKey
-    ? [...filteredData].sort((a, b) => {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
-        if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
-        if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
-        return 0;
-      })
-    : filteredData;
-
   return (
     <div className="overflow-x-auto border rounded-lg shadow-lg bg-white">
-      <div className="flex gap-2 p-3 flex-wrap items-center bg-gray-50 border-b rounded-t-lg">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="border px-3 py-2 rounded w-1/3 focus:ring-2 focus:ring-blue-300 focus:outline-none"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-
-        <select
-          className="border px-3 py-2 rounded focus:ring-2 focus:ring-blue-300 focus:outline-none"
-          value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value as 'all' | 'true' | 'false')}>
-          <option value="all">Active</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
-
-        {dateColumns.length > 0 && (
-          <div className="flex gap-1 items-center">
-            <label className="text-sm">Date:</label>
-            <input
-              type="text"
-              placeholder="22.09.1960"
-              className="border px-3 py-2 rounded focus:ring-2 focus:ring-blue-300 focus:outline-none"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
-
       <table className="w-full border-collapse">
         <thead className="bg-blue-50">
           <tr>
@@ -117,7 +31,7 @@ function UniversalTableComponent<T extends { id: number | string }>({
               <th
                 key={String(col.key)}
                 className="text-left px-4 py-3 border-b font-semibold text-blue-700 cursor-pointer select-none transition-colors hover:bg-blue-100"
-                onClick={() => handleSort(col.key)}>
+                onClick={() => onSort && onSort(col.key)}>
                 {col.header}
                 {sortKey === col.key && (sortOrder === 'asc' ? ' 🔼' : ' 🔽')}
               </th>
@@ -126,7 +40,7 @@ function UniversalTableComponent<T extends { id: number | string }>({
           </tr>
         </thead>
         <tbody>
-          {sortedData.map((row, idx) => (
+          {data.map((row, idx) => (
             <tr
               key={row.id}
               className={`transition-colors ${
